@@ -33,9 +33,8 @@ public class TetrisGrid {
 		this.gridHeight = gridHeight + 2;
 		
 		grid = new int[this.gridHeight][gridWidth];
-		currentTetrimino = new int[1][2]; // TODO cambiar a [4][2]
+		currentTetrimino = new int[4][2];
 		
-        // TODO test
         random = new Random();
 	}
 	
@@ -153,15 +152,82 @@ public class TetrisGrid {
 		return grid;
 	}
 	
-	// TODO Cambiar por algo que coloque un tetrimino en el grid
 	public void addTetrimino() {
-		int pos = random.nextInt(gridWidth);
+		
+		// Crear el tetrimino
 		int type = random.nextInt(7) + 1;
-		grid[2][pos] = -type;
-		currentTetrimino = new int[][]{{2, pos}};
+		currentTetrimino = new int[4][2];
 		currentTetriminoId = -type;
+
+		// Posicion de la pieza "central"
+		currentTetrimino[0][0] = 1;
+		int currentPosX = (int) Math.floor(gridWidth / 2) - 1;
+		currentTetrimino[0][1] = currentPosX;
+		
+		// Posicion de las demas piezas dependiendo del tipo
+		switch (type) {
+		case 1: // I
+			currentTetrimino[1][0] = 1;
+			currentTetrimino[1][1] = currentPosX + 1;
+			currentTetrimino[2][0] = 1;
+			currentTetrimino[2][1] = currentPosX + 2;
+			currentTetrimino[3][0] = 1;
+			currentTetrimino[3][1] = currentPosX - 1;
+			break;
+		case 2: // T
+			currentTetrimino[1][0] = 1;
+			currentTetrimino[1][1] = currentPosX + 1;
+			currentTetrimino[2][0] = 0;
+			currentTetrimino[2][1] = currentPosX;
+			currentTetrimino[3][0] = 1;
+			currentTetrimino[3][1] = currentPosX - 1;
+			break;
+		case 3: // Z
+			currentTetrimino[1][0] = 0;
+			currentTetrimino[1][1] = currentPosX;
+			currentTetrimino[2][0] = 0;
+			currentTetrimino[2][1] = currentPosX + 1;
+			currentTetrimino[3][0] = 1;
+			currentTetrimino[3][1] = currentPosX - 1;
+			break;
+		case 4: // S
+			currentTetrimino[1][0] = 0;
+			currentTetrimino[1][1] = currentPosX;
+			currentTetrimino[2][0] = 1;
+			currentTetrimino[2][1] = currentPosX + 1;
+			currentTetrimino[3][0] = 0;
+			currentTetrimino[3][1] = currentPosX - 1;
+			break;
+		case 5: // O
+			currentTetrimino[1][0] = 0;
+			currentTetrimino[1][1] = currentPosX;
+			currentTetrimino[2][0] = 1;
+			currentTetrimino[2][1] = currentPosX + 1;
+			currentTetrimino[3][0] = 0;
+			currentTetrimino[3][1] = currentPosX + 1;
+			break;
+		case 6: // L
+			currentTetrimino[1][0] = 1;
+			currentTetrimino[1][1] = currentPosX + 1;
+			currentTetrimino[2][0] = 1;
+			currentTetrimino[2][1] = currentPosX - 1;
+			currentTetrimino[3][0] = 0;
+			currentTetrimino[3][1] = currentPosX + 1;
+			break;
+		case 7: // J
+			currentTetrimino[1][0] = 1;
+			currentTetrimino[1][1] = currentPosX + 1;
+			currentTetrimino[2][0] = 1;
+			currentTetrimino[2][1] = currentPosX - 1;
+			currentTetrimino[3][0] = 0;
+			currentTetrimino[3][1] = currentPosX - 1;
+			break;
+		}
+		
 	}
 
+	// TODO Rotar, mover, etc
+	
 	public int getGridWidth() {
 		return gridWidth;
 	}

@@ -1,6 +1,7 @@
 package tetrisgame;
 
 import java.applet.Applet;
+import java.util.Date;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -14,12 +15,12 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 
 	TetrisGrid tetrisGrid;
 	
-	// TODO test
-	int n = 0;
-	
 	private Image[] tileImages;
-	private Graphics graphics;
+	private Image image;
+	private Graphics graphics, bufferG;
 	private URL base;
+	
+	private long time;
 	
 	@Override
 	public void init() {
@@ -48,6 +49,9 @@ public class MainGame extends Applet implements Runnable, KeyListener {
         tileImages[6] = getImage(base, "data/tetrimino_orange.png"); // L
         tileImages[7] = getImage(base, "data/tetrimino_blue.png"); // J
         
+        image = createImage(this.getWidth(), this.getHeight());
+        bufferG = image.getGraphics();
+        
         graphics = getGraphics();
         
 	}
@@ -61,7 +65,11 @@ public class MainGame extends Applet implements Runnable, KeyListener {
         thread.start();
 	}
 	
-	public void update() {
+	@Override
+	public void update(Graphics g) {
+		
+		//printElapsedTime();
+		
 		if (tetrisGrid.checkForLostGame()) {
 			// TODO
 		}
@@ -72,8 +80,10 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		}
 	}
 	
-	public void paint() {
+	@Override
+	public void paint(Graphics g) {
 		
+		bufferG.drawImage(image, 0, 0, this);
 		for (int i = 2; i < tetrisGrid.getGridHeight(); i++) {
 			for (int j = 0; j < tetrisGrid.getGridWidth(); j++) {
 				graphics.drawImage(getTileImage(tetrisGrid.getGrid()[i][j]),
@@ -85,6 +95,12 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 			}
 		}
 		
+	}
+	
+	// TODO Test
+	private void printElapsedTime() {
+		System.out.println(new Date().getTime()-time);
+		time = new Date().getTime();
 	}
 	
 	private Image getTileImage(int id) {
@@ -99,11 +115,12 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		
 		while (true) {
 			
-			update();
-			paint();
-			
             try {
                 Thread.sleep(100);
+    			
+    			update(graphics);
+    			paint(graphics);
+    			
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
