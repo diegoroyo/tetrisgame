@@ -10,6 +10,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.URL;
 
+import tetrisgame.TetrisGrid.*;
+
 @SuppressWarnings("serial")
 public class MainGame extends Applet implements Runnable, KeyListener {
 
@@ -21,6 +23,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	private URL base;
 	
 	private long time;
+	private final int LOOP_TIME = 500;
 	
 	@Override
 	public void init() {
@@ -30,8 +33,6 @@ public class MainGame extends Applet implements Runnable, KeyListener {
         setFocusable(true);
         Frame frame = (Frame) this.getParent().getParent();
         frame.setTitle("Castañón, ponme el tetris");
-        
-        System.out.println("Applet iniciado");
         
         try {
 			base = getDocumentBase();
@@ -75,7 +76,8 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		}
 		else
 		{
-			tetrisGrid.applyGravity();
+			tetrisGrid.applyForegroundGravity();
+			tetrisGrid.applyBackgroundGravity();
 			tetrisGrid.checkForFullRows();
 		}
 	}
@@ -99,7 +101,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	
 	// TODO Test
 	private void printElapsedTime() {
-		System.out.println(new Date().getTime()-time);
+		System.out.println(new Date().getTime()-time + " ms: " + ((new Date().getTime()-time) - LOOP_TIME));
 		time = new Date().getTime();
 	}
 	
@@ -116,13 +118,14 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		while (true) {
 			
             try {
-                Thread.sleep(100);
+                Thread.sleep(LOOP_TIME);
     			
     			update(graphics);
     			paint(graphics);
     			
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("Interrumpido");
+            	e.printStackTrace();
             }
         }
 		
