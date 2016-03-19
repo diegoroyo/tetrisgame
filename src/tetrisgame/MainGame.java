@@ -1,6 +1,8 @@
 package tetrisgame;
 
 import java.applet.Applet;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.awt.Color;
 import java.awt.Frame;
@@ -13,7 +15,7 @@ import java.net.URL;
 import tetrisgame.TetrisGrid.*;
 
 @SuppressWarnings("serial")
-public class MainGame extends Applet implements Runnable, KeyListener {
+public abstract class MainGame extends Applet implements Runnable, KeyListener {
 
 	TetrisGrid tetrisGrid;
 	
@@ -24,6 +26,18 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	
 	private long time;
 	private final int LOOP_TIME = 500;
+	private final boolean PRINT_ELAPSED_TIME = false;
+	
+	private ArrayList<Integer> pressedKeys = new ArrayList<Integer>();
+	private ArrayList<Integer> VALID_KEYS = new ArrayList<Integer>(
+		Arrays.asList(
+				KeyEvent.VK_RIGHT, // Mover derecha
+				KeyEvent.VK_LEFT, // Mover izquierda
+				KeyEvent.VK_DOWN, // Bajar 1 vez
+				KeyEvent.VK_SPACE, // Bajar abajo del todo
+				KeyEvent.VK_UP, // Rotar (sentido agujas)
+				KeyEvent.VK_SHIFT // Rotar (sentido contrario)
+		));
 	
 	@Override
 	public void init() {
@@ -37,8 +51,11 @@ public class MainGame extends Applet implements Runnable, KeyListener {
         try {
 			base = getDocumentBase();
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
+			System.out.println("Hay que llamar a Castañón porque no se encuentra la base");
 		}
+        
+        pressedKeys = new ArrayList<Integer>();
         
         tileImages = new Image[8];
         tileImages[0] = getImage(base, "data/tetrimino_blank.png"); // vacio
@@ -69,13 +86,39 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	@Override
 	public void update(Graphics g) {
 		
-		//printElapsedTime();
+		if (PRINT_ELAPSED_TIME) {
+			printElapsedTime();
+		}
 		
 		if (tetrisGrid.checkForLostGame()) {
 			// TODO
 		}
 		else
 		{
+			// Controles segun la ultima tecla pulsada
+			if (!pressedKeys.isEmpty()) {
+				switch (pressedKeys.get(pressedKeys.size() - 1)) {
+				case KeyEvent.VK_LEFT:
+					tetrisGrid.moveTetrimino(Direction.LEFT);
+					break;
+				case KeyEvent.VK_RIGHT:
+					tetrisGrid.moveTetrimino(Direction.RIGHT);
+					break;
+				case KeyEvent.VK_DOWN:
+					tetrisGrid.moveTetrimino(Direction.DOWN);
+					break;
+				case KeyEvent.VK_SPACE:
+					tetrisGrid.moveTetrimino(Direction.BOTTOM);
+					break;
+				case KeyEvent.VK_UP:
+					tetrisGrid.rotateTetrimino(true);
+					break;
+				case KeyEvent.VK_SHIFT:
+					tetrisGrid.rotateTetrimino(false);
+					break;
+				}
+			}
+			
 			tetrisGrid.applyForegroundGravity();
 			tetrisGrid.applyBackgroundGravity();
 			tetrisGrid.checkForFullRows();
@@ -99,7 +142,6 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		
 	}
 	
-	// TODO Test
 	private void printElapsedTime() {
 		System.out.println(new Date().getTime()-time + " ms: " + ((new Date().getTime()-time) - LOOP_TIME));
 		time = new Date().getTime();
@@ -133,18 +175,28 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+
+		if (isValidKey(e.getKeyCode())) {
+			if (!pressedKeys.contains(e.getKeyCode())) {
+				pressedKeys.add(e.getKeyCode());
+			}
+		}
 		
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
+		if (isValidKey(e.getKeyCode())) {
+			if (pressedKeys.contains(e.getKeyCode())) {
+				pressedKeys.remove(pressedKeys.indexOf(e.getKeyCode()));
+			}
+		}
 		
+	}
+	
+	private boolean isValidKey(Integer c) {
+		return VALID_KEYS.contains(c);
 	}
 
 }
