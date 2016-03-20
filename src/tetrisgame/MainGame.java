@@ -15,7 +15,7 @@ import java.net.URL;
 import tetrisgame.TetrisGrid.*;
 
 @SuppressWarnings("serial")
-public abstract class MainGame extends Applet implements Runnable, KeyListener {
+public class MainGame extends Applet implements Runnable, KeyListener {
 
 	TetrisGrid tetrisGrid;
 	
@@ -28,7 +28,6 @@ public abstract class MainGame extends Applet implements Runnable, KeyListener {
 	private final int LOOP_TIME = 500;
 	private final boolean PRINT_ELAPSED_TIME = false;
 	
-	private ArrayList<Integer> pressedKeys = new ArrayList<Integer>();
 	private ArrayList<Integer> VALID_KEYS = new ArrayList<Integer>(
 		Arrays.asList(
 				KeyEvent.VK_RIGHT, // Mover derecha
@@ -42,7 +41,7 @@ public abstract class MainGame extends Applet implements Runnable, KeyListener {
 	@Override
 	public void init() {
 		addKeyListener(this);
-        setSize(500, 600);
+        setSize(270, 520);
         setBackground(Color.LIGHT_GRAY);
         setFocusable(true);
         Frame frame = (Frame) this.getParent().getParent();
@@ -54,8 +53,6 @@ public abstract class MainGame extends Applet implements Runnable, KeyListener {
 			e.printStackTrace();
 			System.out.println("Hay que llamar a Castañón porque no se encuentra la base");
 		}
-        
-        pressedKeys = new ArrayList<Integer>();
         
         tileImages = new Image[8];
         tileImages[0] = getImage(base, "data/tetrimino_blank.png"); // vacio
@@ -76,7 +73,11 @@ public abstract class MainGame extends Applet implements Runnable, KeyListener {
 	
 	@Override
 	public void start() {
-		tetrisGrid = new TetrisGrid(10, 10, 250, 500, 10, 20);
+		tetrisGrid = new TetrisGrid(
+				10, 10, // startX, startY
+				250, 500, // width, height
+				10, 20, // gridWidth, gridHeight
+				tileImages);
 		tetrisGrid.addTetrimino();
 		
 		Thread thread = new Thread(this);
@@ -95,33 +96,9 @@ public abstract class MainGame extends Applet implements Runnable, KeyListener {
 		}
 		else
 		{
-			// Controles segun la ultima tecla pulsada
-			if (!pressedKeys.isEmpty()) {
-				switch (pressedKeys.get(pressedKeys.size() - 1)) {
-				case KeyEvent.VK_LEFT:
-					tetrisGrid.moveTetrimino(Direction.LEFT);
-					break;
-				case KeyEvent.VK_RIGHT:
-					tetrisGrid.moveTetrimino(Direction.RIGHT);
-					break;
-				case KeyEvent.VK_DOWN:
-					tetrisGrid.moveTetrimino(Direction.DOWN);
-					break;
-				case KeyEvent.VK_SPACE:
-					tetrisGrid.moveTetrimino(Direction.BOTTOM);
-					break;
-				case KeyEvent.VK_UP:
-					tetrisGrid.rotateTetrimino(true);
-					break;
-				case KeyEvent.VK_SHIFT:
-					tetrisGrid.rotateTetrimino(false);
-					break;
-				}
-			}
-			
 			tetrisGrid.applyForegroundGravity();
-			tetrisGrid.applyBackgroundGravity();
 			tetrisGrid.checkForFullRows();
+			tetrisGrid.applyBackgroundGravity();
 		}
 	}
 	
@@ -129,29 +106,14 @@ public abstract class MainGame extends Applet implements Runnable, KeyListener {
 	public void paint(Graphics g) {
 		
 		bufferG.drawImage(image, 0, 0, this);
-		for (int i = 2; i < tetrisGrid.getGridHeight(); i++) {
-			for (int j = 0; j < tetrisGrid.getGridWidth(); j++) {
-				graphics.drawImage(getTileImage(tetrisGrid.getGrid()[i][j]),
-						tetrisGrid.getStartX() + tetrisGrid.getTileWidth() * j,
-						tetrisGrid.getStartY() + tetrisGrid.getTileHeight() * (i - 2),
-						tetrisGrid.getTileWidth(),
-						tetrisGrid.getTileHeight(),
-						this);
-			}
-		}
+		
+		tetrisGrid.paint(graphics);
 		
 	}
 	
 	private void printElapsedTime() {
 		System.out.println(new Date().getTime()-time + " ms: " + ((new Date().getTime()-time) - LOOP_TIME));
 		time = new Date().getTime();
-	}
-	
-	private Image getTileImage(int id) {
-		if (id < 0) {
-			id = -id;
-		}
-		return tileImages[id];
 	}
 	
 	@Override
@@ -176,27 +138,45 @@ public abstract class MainGame extends Applet implements Runnable, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 
-		if (isValidKey(e.getKeyCode())) {
-			if (!pressedKeys.contains(e.getKeyCode())) {
-				pressedKeys.add(e.getKeyCode());
-			}
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_LEFT:
+			tetrisGrid.moveTetrimino(Direction.LEFT);
+			break;
+		case KeyEvent.VK_RIGHT:
+			tetrisGrid.moveTetrimino(Direction.RIGHT);
+			break;
+		case KeyEvent.VK_DOWN:
+			tetrisGrid.moveTetrimino(Direction.DOWN);
+			break;
+		case KeyEvent.VK_SPACE:
+			tetrisGrid.moveTetrimino(Direction.BOTTOM);
+			break;
+		case KeyEvent.VK_UP:
+			tetrisGrid.rotateTetrimino(true);
+			break;
+		case KeyEvent.VK_SHIFT:
+			tetrisGrid.rotateTetrimino(false);
+			break;
 		}
 		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		
 		if (isValidKey(e.getKeyCode())) {
-			if (pressedKeys.contains(e.getKeyCode())) {
-				pressedKeys.remove(pressedKeys.indexOf(e.getKeyCode()));
-			}
+			tetrisGrid.paint(graphics);
 		}
 		
 	}
 	
 	private boolean isValidKey(Integer c) {
 		return VALID_KEYS.contains(c);
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// Nada
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// Nada
 	}
 
 }

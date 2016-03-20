@@ -1,5 +1,7 @@
 package tetrisgame;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.util.Random;
 
 public class TetrisGrid {
@@ -30,8 +32,11 @@ public class TetrisGrid {
 
 	private int[][] currentTetrimino;
 	private int currentTetriminoId;
+	private int stopCooldown;
+	
+	private Image[] tileImages;
 
-	public TetrisGrid(int startX, int startY, int totalWidth, int totalHeight, int gridWidth, int gridHeight) {
+	public TetrisGrid(int startX, int startY, int totalWidth, int totalHeight, int gridWidth, int gridHeight, Image[] tileImages) {
 		this.startX = startX;
 		this.startY = startY;
 		this.totalWidth = totalWidth;
@@ -46,6 +51,9 @@ public class TetrisGrid {
 
 		grid = new int[this.gridHeight][gridWidth];
 		currentTetrimino = new int[4][2];
+		stopCooldown = 2;
+		
+		this.tileImages = tileImages;
 
 		random = new Random();
 	}
@@ -62,22 +70,13 @@ public class TetrisGrid {
 	// Gravedad de tiles no posicionados
 	public void applyForegroundGravity() {
 
-		//boolean canFall = true;
-
-		// nueva posicion del tetrimino, un bloque mas abajo
+		// Nueva posicion del tetrimino, un bloque mas abajo
 		int[][] newPos = new int[currentTetrimino.length][2];
 		for (int i = 0; i < currentTetrimino.length; i++) {
 			newPos[i][0] = currentTetrimino[i][0] + 1;
 			newPos[i][1] = currentTetrimino[i][1];
-			/*if (newPos[i][0] == gridHeight) {
-				canFall = false;
-				break;
-			} else if (grid[newPos[i][0]][newPos[i][1]] > 0) {
-				canFall = false;
-				break;
-			}*/
 		}
-		//if (canFall) {
+		
 		if (canFitInGrid(newPos)) {
 			// Cambia el tetrimino para que baje un bloque
 			for (int i = 0; i < currentTetrimino.length; i++) {
@@ -88,10 +87,13 @@ public class TetrisGrid {
 			}
 			currentTetrimino = newPos;
 		} else {
-			for (int i = 0; i < currentTetrimino.length; i++) {
-				grid[currentTetrimino[i][0]][currentTetrimino[i][1]] = -currentTetriminoId;
+			stopCooldown--;
+			if (stopCooldown <= 0) {
+				for (int i = 0; i < currentTetrimino.length; i++) {
+					grid[currentTetrimino[i][0]][currentTetrimino[i][1]] = -currentTetriminoId;
+				}
+				addTetrimino();
 			}
-			addTetrimino();
 		}
 
 	}
@@ -120,6 +122,9 @@ public class TetrisGrid {
 						grid[i][k] = 0;
 					}
 				}
+				
+				// Volver a bajar las piezas
+				applyBackgroundGravity();
 			}
 		}
 	}
@@ -140,7 +145,6 @@ public class TetrisGrid {
 
 			// Quitar la fila
 			if (isFull) {
-				System.out.println("Fila llena");
 				for (int k = 0; k < gridWidth; k++) {
 					grid[i][k] = 0;
 					// TODO Dar puntos
@@ -238,6 +242,8 @@ public class TetrisGrid {
 			currentTetrimino[3][1] = currentPosX - 1;
 			break;
 		}
+		
+		stopCooldown = 2;
 
 	}
 
@@ -268,6 +274,7 @@ public class TetrisGrid {
 
 		// Cambiar las posiciones
 		if (canFitInGrid(newPos)) {
+			stopCooldown = 2;
 			changePosition(currentTetrimino, newPos);
 		}
 
@@ -341,6 +348,11 @@ public class TetrisGrid {
 		}
 		
 		if (canFitInGrid(newPos)) {
+			
+			// Si hay que bajarlo del todo no tiene sentido dejar el stopCooldown
+			if (direction != Direction.BOTTOM) {
+				stopCooldown = 2;
+			}
 			changePosition(currentTetrimino, newPos);
 		}
 		
@@ -387,6 +399,28 @@ public class TetrisGrid {
 		
 	}
 
+	public void paint(Graphics g) {
+		
+		for (int i = 2; i < gridHeight; i++) {
+			for (int j = 0; j < gridWidth; j++) {
+				g.drawImage(getTileImage(grid[i][j]),
+						startX + tileWidth * j,
+						startY + tileHeight * (i - 2),
+						tileWidth,
+						tileHeight,
+						null);
+			}
+		}
+		
+	}
+	
+	private Image getTileImage(int id) {
+		if (id < 0) {
+			id = -id;
+		}
+		return tileImages[id];
+	}
+	
 	public int[][] getGrid() {
 		return grid;
 	}
