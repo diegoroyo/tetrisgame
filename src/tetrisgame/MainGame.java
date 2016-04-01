@@ -54,7 +54,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 			System.out.println("Hay que llamar a Castañón porque no se encuentra la base");
 		}
         
-        tileImages = new Image[8];
+        tileImages = new Image[9];
         tileImages[0] = getImage(base, "data/tetrimino_blank.png"); // vacio
         tileImages[1] = getImage(base, "data/tetrimino_lightblue.png"); // I
         tileImages[2] = getImage(base, "data/tetrimino_purple.png"); // T
@@ -63,6 +63,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
         tileImages[5] = getImage(base, "data/tetrimino_yellow.png"); // O
         tileImages[6] = getImage(base, "data/tetrimino_orange.png"); // L
         tileImages[7] = getImage(base, "data/tetrimino_blue.png"); // J
+        tileImages[8] = getImage(base, "data/tetrimino_shadow.png"); // sombra
         
         image = createImage(this.getWidth(), this.getHeight());
         bufferG = image.getGraphics();
@@ -99,6 +100,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 			tetrisGrid.applyForegroundGravity();
 			tetrisGrid.checkForFullRows();
 			tetrisGrid.applyBackgroundGravity();
+			tetrisGrid.updateShadowPosition();
 		}
 	}
 	
@@ -160,6 +162,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		}
 		
 		if (isValidKey(e.getKeyCode())) {
+			tetrisGrid.updateShadowPosition();
 			tetrisGrid.paint(graphics);
 		}
 		

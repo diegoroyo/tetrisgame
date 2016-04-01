@@ -27,12 +27,15 @@ public class TetrisGrid {
 	 * 5: O, amarillo
 	 * 6: L, naranja
 	 * 7: J, azul oscuro
+	 * 
 	 */
 	private int[][] grid;
 
 	private int[][] currentTetrimino;
 	private int currentTetriminoId;
 	private int stopCooldown;
+	
+	private int[][] shadowPos;
 	
 	private Image[] tileImages;
 
@@ -52,6 +55,8 @@ public class TetrisGrid {
 		grid = new int[this.gridHeight][gridWidth];
 		currentTetrimino = new int[4][2];
 		stopCooldown = 2;
+		
+		shadowPos = new int[4][2];
 		
 		this.tileImages = tileImages;
 
@@ -313,34 +318,11 @@ public class TetrisGrid {
 			
 		case BOTTOM: // Abajo (del todo)
 			
-			int[][] lastGoodPos = new int[4][2];
-			for (int i = 0; i < 4; i++) {
-				lastGoodPos[i][0] = currentTetrimino[i][0];
-				lastGoodPos[i][1] = currentTetrimino[i][1];
-				newPos[i][1] = currentTetrimino[i][1];
-			}
+			int[][] shadowPos = getShadowPosition();
 			
-			while (true) {
-				
-				// Moverlo hacia abajo
-				for (int i = 0; i < 4; i++) {
-					newPos[i][0] = lastGoodPos[i][0] + 1;
-				}
-				
-				// Si se puede seguir, se sigue
-				if (canFitInGrid(newPos)) {
-					for (int i = 0; i < 4; i++) {
-						lastGoodPos[i][0] = newPos[i][0];
-					}
-				} else {
-					break;
-				}
-				
-			}
-
 			for (int i = 0; i < 4; i++) {
-				newPos[i][0] = lastGoodPos[i][0];
-				newPos[i][1] = lastGoodPos[i][1];
+				newPos[i][0] = shadowPos[i][0];
+				newPos[i][1] = shadowPos[i][1];
 			}
 			
 			break;
@@ -356,6 +338,48 @@ public class TetrisGrid {
 			changePosition(currentTetrimino, newPos);
 		}
 		
+	}
+	
+	// Cambia la posicion de la sombra
+	public void updateShadowPosition() {
+		shadowPos = getShadowPosition();
+	}
+	
+	// Consigue la posicion de la sombra
+	private int[][] getShadowPosition() {
+		int[][] shadowPos = new int[4][2];
+		
+		int[][] lastGoodPos = new int[4][2];
+		for (int i = 0; i < 4; i++) {
+			lastGoodPos[i][0] = currentTetrimino[i][0];
+			lastGoodPos[i][1] = currentTetrimino[i][1];
+			shadowPos[i][1] = currentTetrimino[i][1];
+		}
+		
+		while (true) {
+			
+			// Moverlo hacia abajo
+			for (int i = 0; i < 4; i++) {
+				shadowPos[i][0] = lastGoodPos[i][0] + 1;
+			}
+			
+			// Si se puede seguir, se sigue
+			if (canFitInGrid(shadowPos)) {
+				for (int i = 0; i < 4; i++) {
+					lastGoodPos[i][0] = shadowPos[i][0];
+				}
+			} else {
+				break;
+			}
+			
+		}
+
+		for (int i = 0; i < 4; i++) {
+			shadowPos[i][0] = lastGoodPos[i][0];
+			shadowPos[i][1] = lastGoodPos[i][1];
+		}
+		
+		return shadowPos;
 	}
 	
 	// Comprueba si el tetrimino dado cabe en el grid sin salirse ni chocar
@@ -409,6 +433,21 @@ public class TetrisGrid {
 						tileWidth,
 						tileHeight,
 						null);
+			}
+		}
+		
+		// Dibujar la sombra encima
+		for (int i = 0; i < 4; i++) {
+			if (shadowPos[i][0] >= 2 && shadowPos[i][0] < gridHeight &&
+					shadowPos[i][1] >= 0 && shadowPos[i][1] < gridWidth) {
+				if (grid[shadowPos[i][0]][shadowPos[i][1]] == 0) {
+					g.drawImage(getTileImage(8),
+							startX + tileWidth * shadowPos[i][1],
+							startY + tileHeight * (shadowPos[i][0] - 2),
+							tileWidth,
+							tileHeight,
+							null);
+				}
 			}
 		}
 		
