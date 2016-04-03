@@ -18,6 +18,7 @@ import tetrisgame.TetrisGrid.*;
 public class MainGame extends Applet implements Runnable, KeyListener {
 
 	TetrisGrid tetrisGrid;
+	StatsMenu statsMenu;
 	
 	private Image[] tileImages;
 	private Image image;
@@ -41,7 +42,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	@Override
 	public void init() {
 		addKeyListener(this);
-        setSize(270, 520);
+        setSize(400, 520);
         setBackground(Color.LIGHT_GRAY);
         setFocusable(true);
         Frame frame = (Frame) this.getParent().getParent();
@@ -74,12 +75,19 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	
 	@Override
 	public void start() {
+		
+		statsMenu = new StatsMenu(
+				270, 10, // startX, startY
+				120, 500); // width, height
+		
 		tetrisGrid = new TetrisGrid(
 				10, 10, // startX, startY
 				250, 500, // width, height
 				10, 20, // gridWidth, gridHeight
-				tileImages);
-		tetrisGrid.addTetrimino();
+				tileImages, // tiles usados
+				statsMenu); // menu el cual controla
+		
+		tetrisGrid.start();
 		
 		Thread thread = new Thread(this);
         thread.start();

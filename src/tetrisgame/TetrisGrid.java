@@ -5,6 +5,8 @@ import java.awt.Image;
 import java.util.Random;
 
 public class TetrisGrid {
+	
+	StatsMenu statsMenu;
 
 	public enum Direction {
 		LEFT, RIGHT, DOWN, BOTTOM;
@@ -27,7 +29,6 @@ public class TetrisGrid {
 	 * 5: O, amarillo
 	 * 6: L, naranja
 	 * 7: J, azul oscuro
-	 * 
 	 */
 	private int[][] grid;
 
@@ -39,7 +40,9 @@ public class TetrisGrid {
 	
 	private Image[] tileImages;
 
-	public TetrisGrid(int startX, int startY, int totalWidth, int totalHeight, int gridWidth, int gridHeight, Image[] tileImages) {
+	public TetrisGrid(int startX, int startY, int totalWidth, int totalHeight, int gridWidth, int gridHeight, Image[] tileImages, StatsMenu statsMenu) {
+		this.statsMenu = statsMenu;
+		
 		this.startX = startX;
 		this.startY = startY;
 		this.totalWidth = totalWidth;
@@ -61,6 +64,11 @@ public class TetrisGrid {
 		this.tileImages = tileImages;
 
 		random = new Random();
+	}
+	
+	public void start() {
+		statsMenu.start(1); // TODO nivel
+		addTetrimino();
 	}
 
 	// Vaciar todo
@@ -179,7 +187,7 @@ public class TetrisGrid {
 	public void addTetrimino() {
 
 		// Crear el tetrimino
-		int type = random.nextInt(7) + 1;
+		int type = statsMenu.getNextTetrimino();
 		currentTetrimino = new int[4][2];
 		currentTetriminoId = -type;
 
