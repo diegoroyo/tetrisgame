@@ -2,6 +2,7 @@ package tetrisgame;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class TetrisGrid {
@@ -38,9 +39,9 @@ public class TetrisGrid {
 	
 	private int[][] shadowPos;
 	
-	private Image[] tileImages;
+	private BufferedImage imageTetriminos;
 
-	public TetrisGrid(int startX, int startY, int totalWidth, int totalHeight, int gridWidth, int gridHeight, Image[] tileImages, StatsMenu statsMenu) {
+	public TetrisGrid(int startX, int startY, int totalWidth, int totalHeight, int gridWidth, int gridHeight, BufferedImage imageTetriminos, StatsMenu statsMenu) {
 		this.statsMenu = statsMenu;
 		
 		this.startX = startX;
@@ -61,7 +62,7 @@ public class TetrisGrid {
 		
 		shadowPos = new int[4][2];
 		
-		this.tileImages = tileImages;
+		this.imageTetriminos = imageTetriminos;
 
 		random = new Random();
 	}
@@ -465,7 +466,7 @@ public class TetrisGrid {
 		if (id < 0) {
 			id = -id;
 		}
-		return tileImages[id];
+		return imageTetriminos.getSubimage(16 * id, 0, 16, 16); // x, y, width, height
 	}
 	
 	public int[][] getGrid() {

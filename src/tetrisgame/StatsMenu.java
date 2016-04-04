@@ -1,5 +1,6 @@
 package tetrisgame;
 
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class StatsMenu {
@@ -12,8 +13,10 @@ public class StatsMenu {
 	int savedTetrimino;
 
 	int points, level;
+	
+	BufferedImage imageNumbers;
 
-	public StatsMenu(int startX, int startY, int menuWidth, int menuHeight) {
+	public StatsMenu(int startX, int startY, int menuWidth, int menuHeight, BufferedImage imageNumbers) {
 		this.startX = startX;
 		this.startY = startY;
 		this.menuWidth = menuWidth;
@@ -21,6 +24,8 @@ public class StatsMenu {
 	
 		nextTetriminos = new int[3];
 		random = new Random();
+		
+		this.imageNumbers = imageNumbers;
 	}
 
 	public void start(int level) {
