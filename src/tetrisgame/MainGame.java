@@ -8,9 +8,13 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import tetrisgame.TetrisGrid.*;
 
@@ -20,10 +24,10 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	TetrisGrid tetrisGrid;
 	StatsMenu statsMenu;
 	
-	private Image[] tileImages;
 	private Image image;
 	private Graphics graphics, bufferG;
-	private URL base;
+	
+	private BufferedImage imageTetriminos, imageNumbers;
 	
 	private long time;
 	private final int LOOP_TIME = 500;
@@ -49,22 +53,12 @@ public class MainGame extends Applet implements Runnable, KeyListener {
         frame.setTitle("Castañón, ponme el tetris");
         
         try {
-			base = getDocumentBase();
-		} catch (Exception e) {
+			imageTetriminos = ImageIO.read(new File("data/tetriminos.png"));
+			imageNumbers = ImageIO.read(new File("data/numbers.png"));
+		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Hay que llamar a Castañón porque no se encuentra la base");
+			System.out.println("No se han podido cargar los archivos del juego.");
 		}
-        
-        tileImages = new Image[9];
-        tileImages[0] = getImage(base, "data/tetrimino_blank.png"); // vacio
-        tileImages[1] = getImage(base, "data/tetrimino_lightblue.png"); // I
-        tileImages[2] = getImage(base, "data/tetrimino_purple.png"); // T
-        tileImages[3] = getImage(base, "data/tetrimino_red.png"); // Z
-        tileImages[4] = getImage(base, "data/tetrimino_green.png"); // S
-        tileImages[5] = getImage(base, "data/tetrimino_yellow.png"); // O
-        tileImages[6] = getImage(base, "data/tetrimino_orange.png"); // L
-        tileImages[7] = getImage(base, "data/tetrimino_blue.png"); // J
-        tileImages[8] = getImage(base, "data/tetrimino_shadow.png"); // sombra
         
         image = createImage(this.getWidth(), this.getHeight());
         bufferG = image.getGraphics();
@@ -78,13 +72,14 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		
 		statsMenu = new StatsMenu(
 				270, 10, // startX, startY
-				120, 500); // width, height
+				120, 500, // width, height
+				imageNumbers); // numeros usados
 		
 		tetrisGrid = new TetrisGrid(
 				10, 10, // startX, startY
 				250, 500, // width, height
 				10, 20, // gridWidth, gridHeight
-				tileImages, // tiles usados
+				imageTetriminos, // tiles usados
 				statsMenu); // menu el cual controla
 		
 		tetrisGrid.start();
