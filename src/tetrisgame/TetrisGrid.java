@@ -263,8 +263,10 @@ public class TetrisGrid {
 
 	// Rota el tetrimino si se puede
 	public void rotateTetrimino(boolean rotateClockwise) {
-
-		if (currentTetriminoId == -5) { return; } // Si es un cuadrado apaga y vamonos
+		
+		// Si es un cuadrado apaga y vamonos
+		// y si no se debe mover pues tambien
+		if (currentTetriminoId == -5 || stopCooldown == 0) { return; }
 
 		int[][] newPos = new int[4][2];
 
@@ -296,6 +298,8 @@ public class TetrisGrid {
 
 	// Mueve el tetrimino (izquierda, derecha, abajo, abajo del todo)
 	public void moveTetrimino(Direction direction) {
+		
+		if (stopCooldown == 0) { return; } // para cuando no se deba mover
 		
 		int[][] newPos = new int[4][2];
 		
@@ -340,9 +344,11 @@ public class TetrisGrid {
 		
 		if (canFitInGrid(newPos)) {
 			
-			// Si hay que bajarlo del todo no tiene sentido dejar el stopCooldown
-			if (direction != Direction.BOTTOM) {
-				stopCooldown = 2;
+			if (direction == Direction.BOTTOM) {
+				stopCooldown = 0; // si se baja del todo convertirlo a solido
+				applyForegroundGravity(); 
+			} else {
+				stopCooldown = 2; // si no, se puede seguir moviendo
 			}
 			changePosition(currentTetrimino, newPos);
 		}
@@ -433,6 +439,8 @@ public class TetrisGrid {
 	}
 
 	public void paint(Graphics g) {
+		
+		// TODO cambiar la forma que se dibuja
 		
 		for (int i = 2; i < gridHeight; i++) {
 			for (int j = 0; j < gridWidth; j++) {

@@ -13,7 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
 import tetrisgame.TetrisGrid.*;
@@ -31,7 +30,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	
 	private long time;
 	private final int LOOP_TIME = 500;
-	private final boolean PRINT_ELAPSED_TIME = false;
+	private final boolean PRINT_ELAPSED_TIME = true;
 	
 	private ArrayList<Integer> VALID_KEYS = new ArrayList<Integer>(
 		Arrays.asList(
