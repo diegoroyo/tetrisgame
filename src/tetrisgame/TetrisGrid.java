@@ -470,7 +470,7 @@ public class TetrisGrid {
 		
 	}
 	
-	private Image getTileImage(int id) {
+	private Image getTileImage(int id) { // TODO
 		if (id < 0) {
 			id = -id;
 		}
