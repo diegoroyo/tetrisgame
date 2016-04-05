@@ -13,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 import tetrisgame.TetrisGrid.*;
@@ -20,8 +21,7 @@ import tetrisgame.TetrisGrid.*;
 @SuppressWarnings("serial")
 public class MainGame extends Applet implements Runnable, KeyListener {
 	
-	// TODO cambiar la forma de dibujar para que solo se dibuje lo que cambie
-	// TODO permitir resizear el juego (todos los width/height de drawImage con escala)
+	// TODO permitir resizear el juego (todos los width/height de drawImage con escala) + poner firstDraw a false
 	
 	TetrisGrid tetrisGrid;
 	StatsMenu statsMenu;
@@ -94,10 +94,9 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 				imageTetriminos, // tiles usados
 				statsMenu); // menu el cual controla
 		
-		tetrisGrid.start();
-		
 		Thread thread = new Thread(this);
         thread.start();
+		
 	}
 	
 	@Override
@@ -137,9 +136,12 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	@Override
 	public void run() {
 		
+		tetrisGrid.start(graphics);
+		
 		while (true) {
 			
             try {
+            	
                 Thread.sleep(LOOP_TIME);
     			
     			update(graphics);

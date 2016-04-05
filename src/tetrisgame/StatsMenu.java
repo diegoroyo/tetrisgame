@@ -7,27 +7,24 @@ import java.util.Random;
 
 public class StatsMenu {
 
-	int startX, startY, menuWidth, menuHeight;
+	private int startX, startY, menuWidth, menuHeight;
 
-	Random random;
-	int[] nextTetriminos;
+	private Random random;
+	private int[] nextTetriminos;
 
-	int savedTetrimino;
+	private int savedTetrimino;
 
-	int points, level;
+	private int points, level, lines, time;
 	
-	ArrayList<BufferedImage> imageResources;
+	private ArrayList<BufferedImage> imageResources;
 	public enum Images {
 		MENU_BACKGROUND,
 		NUMBERS,
 		POINTS_BACKGROUND;
 	}
 	
-	Graphics graphics; // TODO hacerlo de otra manera que no tenga que guardar los graphics aqui
-	
-	// TODO quitar esto pero ahora asi me acuerdo i guess porque ahora queda mal
-	// private final int LVL_X = 34;
-	// private final int LVL_Y = 258;
+	private Graphics graphics; // TODO hacerlo de otra manera que no tenga que guardar los graphics aqui
+	private boolean firstPaint;
 
 	public StatsMenu(int startX, int startY, int menuWidth, int menuHeight, ArrayList<BufferedImage> imageResources, Graphics graphics) {
 		this.startX = startX;
@@ -41,12 +38,15 @@ public class StatsMenu {
 		this.imageResources = imageResources;
 		
 		this.graphics = graphics;
+		
+		firstPaint = false;
 	}
 
 	public void start(int level) {
 		this.level = level;
-
 		points = 0;
+		
+		firstPaint = true;
 
 		for (int i = 0; i < 3; i++) {
 			nextTetriminos[i] = random.nextInt(7) + 1;
@@ -81,10 +81,12 @@ public class StatsMenu {
 	
 	public void paint(Graphics g) {
 		
-		g.drawImage(imageResources.get(Images.MENU_BACKGROUND.ordinal()),
-				startX, startY,
-				menuWidth, menuHeight,
-				null);
+		if (firstPaint) {
+			g.drawImage(imageResources.get(Images.MENU_BACKGROUND.ordinal()),
+					startX, startY,
+					menuWidth, menuHeight,
+					null);
+		}
 		
 		// dibujar el fondo del score para que no 
 		g.drawImage(imageResources.get(Images.POINTS_BACKGROUND.ordinal()),
@@ -93,7 +95,7 @@ public class StatsMenu {
 				null);
 		
 		// dibujar el score
-		String pointsString = getPointsAsString(points);
+		String pointsString = getNumberAsString(points, 6);
 		for (int i = 0; i < 6; i++) {
 			g.drawImage(getNumber(Character.getNumericValue(pointsString.charAt(i))), // el numero
 					startX + 2 + 16 * i, startY + 203, // x, y
@@ -101,14 +103,39 @@ public class StatsMenu {
 					null);
 		}
 		
+		String levelString = getNumberAsString(level, 2);
+		for (int i = 0; i < 2; i++) {
+			g.drawImage(getNumber(Character.getNumericValue(levelString.charAt(i))), // el numero
+					startX + 2 + 16 * i, startY + 258, // x, y
+					16, 16, // width, height
+					null);
+		}
+		
+		String linesString = getNumberAsString(lines, 3);
+		for (int i = 0; i < 3; i++) {
+			g.drawImage(getNumber(Character.getNumericValue(linesString.charAt(i))), // el numero
+					startX + 50 + 16 * i, startY + 258, // x, y
+					16, 16, // width, height
+					null);
+		}
+		
+		String timeString = getNumberAsString((int) Math.floor(time / 60), 2) + ":" + getNumberAsString(time % 60, 2);
+		for (int i = 0; i < 5; i++) {
+			g.drawImage(getNumber(Character.getNumericValue(timeString.charAt(i))), // el numero
+					startX + 10 + 16 * i, startY + 432, // x, y
+					16, 16, // width, height
+					null);
+		}
+		
 	}
 	
-	private String getPointsAsString(int points) {
+	private String getNumberAsString(int points, int zeroes) {
 		String s = Integer.toString(points);
-		return new String(new char[6 - s.length()]).replace('\0', '0') + s;
+		return new String(new char[zeroes - s.length()]).replace('\0', '0') + s;
 	}
 	
 	private BufferedImage getNumber(int number) {
+		if (number == -1) { return imageResources.get(Images.NUMBERS.ordinal()).getSubimage(160, 0, 16, 16); }
 		return imageResources.get(Images.NUMBERS.ordinal()).getSubimage(16 * number, 0, 16, 16);
 	}
 	
