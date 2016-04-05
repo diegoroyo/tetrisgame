@@ -19,14 +19,18 @@ import tetrisgame.TetrisGrid.*;
 
 @SuppressWarnings("serial")
 public class MainGame extends Applet implements Runnable, KeyListener {
-
+	
+	// TODO cambiar la forma que se dibuja para que solo se dibuje lo que cambie
+	// TODO cambiar la forma que carga las imagenes para no tener que tener un constructor con tantos argumentos (?)
+	// TODO permitir resizear el juego (todos los width/height de drawImage con escala)
+	
 	TetrisGrid tetrisGrid;
 	StatsMenu statsMenu;
 	
 	private Image image;
 	private Graphics graphics, bufferG;
 	
-	private BufferedImage imageTetriminos, imageNumbers;
+	private BufferedImage imageTetriminos, imageNumbers, imageMenuBackground, imageMenuPointsBackground;
 	
 	private long time;
 	private final int LOOP_TIME = 500;
@@ -45,7 +49,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	@Override
 	public void init() {
 		addKeyListener(this);
-        setSize(400, 520);
+        setSize(380, 520);
         setBackground(Color.LIGHT_GRAY);
         setFocusable(true);
         Frame frame = (Frame) this.getParent().getParent();
@@ -53,7 +57,11 @@ public class MainGame extends Applet implements Runnable, KeyListener {
         
         try {
 			imageTetriminos = ImageIO.read(new File("data/tetriminos.png"));
+			
+			imageMenuBackground = ImageIO.read(new File("data/menu_background2.png"));
+			imageMenuPointsBackground = ImageIO.read(new File("data/points_background.png"));
 			imageNumbers = ImageIO.read(new File("data/numbers.png"));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("No se han podido cargar los archivos del juego.");
@@ -71,8 +79,11 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		
 		statsMenu = new StatsMenu(
 				270, 10, // startX, startY
-				120, 500, // width, height
-				imageNumbers); // numeros usados
+				100, 500, // width, height
+				imageMenuBackground, // fondo
+				imageMenuPointsBackground, // fondo de los puntos
+				imageNumbers, // numeros
+				graphics); 
 		
 		tetrisGrid = new TetrisGrid(
 				10, 10, // startX, startY
@@ -112,6 +123,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		bufferG.drawImage(image, 0, 0, this);
 		
 		tetrisGrid.paint(graphics);
+		statsMenu.paint(graphics);
 		
 	}
 	

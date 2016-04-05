@@ -1,7 +1,6 @@
 package tetrisgame;
 
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -264,6 +263,8 @@ public class TetrisGrid {
 	// Rota el tetrimino si se puede
 	public void rotateTetrimino(boolean rotateClockwise) {
 		
+		statsMenu.addPoints(1); // TODO test
+		
 		// Si es un cuadrado apaga y vamonos
 		// y si no se debe mover pues tambien
 		if (currentTetriminoId == -5 || stopCooldown == 0) { return; }
@@ -440,8 +441,6 @@ public class TetrisGrid {
 
 	public void paint(Graphics g) {
 		
-		// TODO cambiar la forma que se dibuja
-		
 		for (int i = 2; i < gridHeight; i++) {
 			for (int j = 0; j < gridWidth; j++) {
 				g.drawImage(getTileImage(grid[i][j]),
@@ -470,7 +469,7 @@ public class TetrisGrid {
 		
 	}
 	
-	private Image getTileImage(int id) { // TODO
+	private BufferedImage getTileImage(int id) {
 		if (id < 0) {
 			id = -id;
 		}

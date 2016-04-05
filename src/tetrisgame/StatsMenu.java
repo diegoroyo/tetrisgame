@@ -1,5 +1,6 @@
 package tetrisgame;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -14,9 +15,14 @@ public class StatsMenu {
 
 	int points, level;
 	
-	BufferedImage imageNumbers;
+	BufferedImage imageMenuBackground, imageMenuPointsBackground, imageNumbers;
+	Graphics graphics; // TODO hacerlo de otra manera que no tenga que guardar los graphics aqui
+	
+	// TODO quitar esto pero ahora asi me acuerdo i guess porque ahora queda mal
+	// private final int LVL_X = 34;
+	// private final int LVL_Y = 258;
 
-	public StatsMenu(int startX, int startY, int menuWidth, int menuHeight, BufferedImage imageNumbers) {
+	public StatsMenu(int startX, int startY, int menuWidth, int menuHeight, BufferedImage imageMenuBackground, BufferedImage imageMenuPointsBackground, BufferedImage imageNumbers, Graphics graphics) {
 		this.startX = startX;
 		this.startY = startY;
 		this.menuWidth = menuWidth;
@@ -25,7 +31,11 @@ public class StatsMenu {
 		nextTetriminos = new int[3];
 		random = new Random();
 		
+		this.imageMenuBackground = imageMenuBackground;
+		this.imageMenuPointsBackground = imageMenuPointsBackground;
 		this.imageNumbers = imageNumbers;
+		
+		this.graphics = graphics;
 	}
 
 	public void start(int level) {
@@ -56,6 +66,45 @@ public class StatsMenu {
 		nextTetriminos[2] = random.nextInt(7) + 1;
 
 		return tempTetriminos[0];
+	}
+	
+	public void addPoints(int pointsToAdd) {
+		points += pointsToAdd;
+		
+		paint(graphics);
+	}
+	
+	public void paint(Graphics g) {
+		
+		g.drawImage(imageMenuBackground,
+				startX, startY,
+				menuWidth, menuHeight,
+				null);
+		
+		// dibujar el fondo del score para que no 
+		g.drawImage(imageMenuPointsBackground,
+				startX + 2, startY + 203, // x, y
+				96, 16, // width, height
+				null);
+		
+		// dibujar el score
+		String pointsString = getPointsAsString(points);
+		for (int i = 0; i < 6; i++) {
+			g.drawImage(getNumber(Character.getNumericValue(pointsString.charAt(i))), // el numero
+					startX + 2 + 16 * i, startY + 203, // x, y
+					16, 16, // width, height
+					null);
+		}
+		
+	}
+	
+	private String getPointsAsString(int points) {
+		String s = Integer.toString(points);
+		return new String(new char[6 - s.length()]).replace('\0', '0') + s;
+	}
+	
+	private BufferedImage getNumber(int number) {
+		return imageNumbers.getSubimage(16 * number, 0, 16, 16);
 	}
 	
 }
