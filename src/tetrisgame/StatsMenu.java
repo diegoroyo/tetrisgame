@@ -2,6 +2,7 @@ package tetrisgame;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class StatsMenu {
@@ -15,14 +16,20 @@ public class StatsMenu {
 
 	int points, level;
 	
-	BufferedImage imageMenuBackground, imageMenuPointsBackground, imageNumbers;
+	ArrayList<BufferedImage> imageResources;
+	public enum Images {
+		MENU_BACKGROUND,
+		NUMBERS,
+		POINTS_BACKGROUND;
+	}
+	
 	Graphics graphics; // TODO hacerlo de otra manera que no tenga que guardar los graphics aqui
 	
 	// TODO quitar esto pero ahora asi me acuerdo i guess porque ahora queda mal
 	// private final int LVL_X = 34;
 	// private final int LVL_Y = 258;
 
-	public StatsMenu(int startX, int startY, int menuWidth, int menuHeight, BufferedImage imageMenuBackground, BufferedImage imageMenuPointsBackground, BufferedImage imageNumbers, Graphics graphics) {
+	public StatsMenu(int startX, int startY, int menuWidth, int menuHeight, ArrayList<BufferedImage> imageResources, Graphics graphics) {
 		this.startX = startX;
 		this.startY = startY;
 		this.menuWidth = menuWidth;
@@ -31,9 +38,7 @@ public class StatsMenu {
 		nextTetriminos = new int[3];
 		random = new Random();
 		
-		this.imageMenuBackground = imageMenuBackground;
-		this.imageMenuPointsBackground = imageMenuPointsBackground;
-		this.imageNumbers = imageNumbers;
+		this.imageResources = imageResources;
 		
 		this.graphics = graphics;
 	}
@@ -76,13 +81,13 @@ public class StatsMenu {
 	
 	public void paint(Graphics g) {
 		
-		g.drawImage(imageMenuBackground,
+		g.drawImage(imageResources.get(Images.MENU_BACKGROUND.ordinal()),
 				startX, startY,
 				menuWidth, menuHeight,
 				null);
 		
 		// dibujar el fondo del score para que no 
-		g.drawImage(imageMenuPointsBackground,
+		g.drawImage(imageResources.get(Images.POINTS_BACKGROUND.ordinal()),
 				startX + 2, startY + 203, // x, y
 				96, 16, // width, height
 				null);
@@ -104,7 +109,7 @@ public class StatsMenu {
 	}
 	
 	private BufferedImage getNumber(int number) {
-		return imageNumbers.getSubimage(16 * number, 0, 16, 16);
+		return imageResources.get(Images.NUMBERS.ordinal()).getSubimage(16 * number, 0, 16, 16);
 	}
 	
 }
