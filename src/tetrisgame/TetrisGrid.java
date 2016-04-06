@@ -6,6 +6,10 @@ import java.util.ArrayList;
 
 public class TetrisGrid {
 	
+	// TODO: Hacer que cambie el nivel respecto a las lineas que lleva
+	// TODO Bug: al moverlo abajo del todo cuando ya esta abajo del todo cambia de color magicamente (moveTetrimino -> bottom)
+	// TODO Bug: cambiar la forma que se pinta la sombra para que no desaparezca a veces por unos ms
+	
 	StatsMenu statsMenu;
 
 	public enum Direction {
@@ -69,11 +73,11 @@ public class TetrisGrid {
 	}
 	
 	public void start(Graphics g) {
-		statsMenu.start(1); // TODO nivel
+		statsMenu.start(1);
+		firstPaint = false;
 		
-		firstPaint = false; // TODO tambien ponerlo falso cuando se cambie el tamaño de la ventana
-		
-		// Añadir un tetrimino y que comience TODO: llamarlo aparte?
+		// Añadir un tetrimino y que comience
+		// TODO: llamarlo aparte?
 		addTetrimino();
 	}
 
@@ -151,6 +155,7 @@ public class TetrisGrid {
 						
 						// Cambia el tile
 						addChangedTile(k, i + 1);
+						addChangedTile(k, i);
 					}
 				}
 				
@@ -176,9 +181,11 @@ public class TetrisGrid {
 
 			// Quitar la fila
 			if (isFull) {
+				statsMenu.addLines(1);
+				statsMenu.addPoints(100);
 				for (int k = 0; k < gridWidth; k++) {
 					grid[i][k] = 0;
-					// TODO Dar puntos
+					// TODO: puntos que cambien segun si haces 1-2-3-4 lineas + back to back tetris etc
 				}
 			}
 		}
@@ -192,7 +199,7 @@ public class TetrisGrid {
 		for (int i = 0; i < gridWidth; i++) {
 			if (grid[0][i] > 0 || grid[1][i] > 0) {
 				hasLost = true;
-				// TODO Puntos
+				// TODO quitar puntos
 				break;
 			}
 		}
@@ -281,8 +288,6 @@ public class TetrisGrid {
 	// Rota el tetrimino si se puede
 	public void rotateTetrimino(boolean rotateClockwise) {
 		
-		statsMenu.addPoints(1); // TODO test
-		
 		// Si es un cuadrado apaga y vamonos
 		// y si no se debe mover pues tambien
 		if (currentTetriminoId == -5 || stopCooldown == 0) { return; }
@@ -349,8 +354,6 @@ public class TetrisGrid {
 			break;
 			
 		case BOTTOM: // Abajo (del todo)
-			
-			// TODO Bug: al moverlo abajo del todo cuando ya esta abajo del todo cambia de color magicamente
 			
 			int[][] shadowPos = getShadowPosition();
 			
@@ -533,8 +536,12 @@ public class TetrisGrid {
 	
 	// Para dibujar solo los tiles cambiados: en changePosition y applyForegroundGravity (todo lo movil) y applyBackgroundGravity (lo del fondo)
 	private void addChangedTile(int x, int y) {
-		if (y < 2) { return; } // No dibujar tiles en las dos primeras filas porque no se ven
-		tilesChanged.add(new int[]{x, y}); 
+		if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
+			if (y < 2) { return; } // No dibujar tiles en las dos primeras filas porque no se ven
+			tilesChanged.add(new int[]{x, y}); 
+		} else {
+			System.out.println("Esto no deberia pasar (2). Posicion: " + x + "," + y); // dio error una vez 
+		}
 	}
 	
 	public int[][] getGrid() {

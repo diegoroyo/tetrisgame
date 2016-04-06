@@ -34,6 +34,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	private ArrayList<BufferedImage> imagesStatsMenu;
 	
 	private long time;
+	private int loopElapsedTimeMillis;
 	private final int LOOP_TIME = 500;
 	private final boolean PRINT_ELAPSED_TIME = true;
 	
@@ -65,7 +66,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 			
 			imagesStatsMenu.add(ImageIO.read(new File("data/menu_background2.png")));
 			imagesStatsMenu.add(ImageIO.read(new File("data/numbers.png")));
-			imagesStatsMenu.add(ImageIO.read(new File("data/points_background.png")));
+			imagesStatsMenu.add(ImageIO.read(new File("data/numbers_background.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("No se han podido cargar los archivos del juego.");
@@ -101,11 +102,6 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 	
 	@Override
 	public void update(Graphics g) {
-		
-		if (PRINT_ELAPSED_TIME) {
-			printElapsedTime();
-		}
-		
 		if (tetrisGrid.checkForLostGame()) {
 			// TODO
 		}
@@ -124,13 +120,8 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		bufferG.drawImage(image, 0, 0, this);
 		
 		tetrisGrid.paint(graphics);
-		statsMenu.paint(graphics);
+		statsMenu.paintBackground(graphics);
 		
-	}
-	
-	private void printElapsedTime() {
-		System.out.println(new Date().getTime()-time + " ms: " + ((new Date().getTime()-time) - LOOP_TIME));
-		time = new Date().getTime();
 	}
 	
 	@Override
@@ -139,10 +130,9 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		tetrisGrid.start(graphics);
 		
 		while (true) {
-			
             try {
             	
-                Thread.sleep(LOOP_TIME);
+                Thread.sleep(LOOP_TIME - getElapsedLoopTime());
     			
     			update(graphics);
     			paint(graphics);
@@ -153,6 +143,25 @@ public class MainGame extends Applet implements Runnable, KeyListener {
             }
         }
 		
+	}
+	
+	private int getElapsedLoopTime() {
+		
+		// primer uso
+		if (time == 0) {
+			time = new Date().getTime();
+			loopElapsedTimeMillis = LOOP_TIME;
+			return 0;
+		} 
+		
+		loopElapsedTimeMillis = (int) (new Date().getTime() - time) + (loopElapsedTimeMillis - LOOP_TIME);
+		if (PRINT_ELAPSED_TIME) {
+			System.out.println("Loop: " + (new Date().getTime() - time) + " ms");
+		} 
+		
+		time = new Date().getTime();
+		
+		return loopElapsedTimeMillis - LOOP_TIME;
 	}
 
 	@Override
