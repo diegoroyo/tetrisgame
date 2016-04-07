@@ -7,9 +7,7 @@ import java.util.ArrayList;
 public class TetrisGrid {
 	
 	// TODO: Hacer que cambie el nivel respecto a las lineas que lleva
-	// TODO Bug: al moverlo abajo del todo cuando ya esta abajo del todo cambia de color magicamente (moveTetrimino -> bottom)
-	// TODO Bug: cambiar la forma que se pinta la sombra para que no desaparezca a veces por unos ms
-	
+	// TODO Bug: no se añaden todos los tiles que cambian a la lista
 	StatsMenu statsMenu;
 
 	public enum Direction {
@@ -182,7 +180,7 @@ public class TetrisGrid {
 			// Quitar la fila
 			if (isFull) {
 				statsMenu.addLines(1);
-				statsMenu.addPoints(100);
+				statsMenu.addPoints(10);
 				for (int k = 0; k < gridWidth; k++) {
 					grid[i][k] = 0;
 					// TODO: puntos que cambien segun si haces 1-2-3-4 lineas + back to back tetris etc
@@ -367,14 +365,13 @@ public class TetrisGrid {
 		}
 		
 		if (canFitInGrid(newPos)) {
-			
+			changePosition(currentTetrimino, newPos);
 			if (direction == Direction.BOTTOM) {
 				stopCooldown = 0; // si se baja del todo convertirlo a solido
-				applyForegroundGravity(); 
+				applyForegroundGravity();
 			} else {
 				stopCooldown = 2; // si no, se puede seguir moviendo
 			}
-			changePosition(currentTetrimino, newPos);
 		}
 		
 	}
@@ -415,7 +412,6 @@ public class TetrisGrid {
 
 		for (int i = 0; i < 4; i++) {
 			shadowPos[i][0] = lastGoodPos[i][0];
-			shadowPos[i][1] = lastGoodPos[i][1];
 		}
 		
 		return shadowPos;
@@ -470,6 +466,28 @@ public class TetrisGrid {
 	
 	public void paint(Graphics g) {
 		
+		// Dibujar la sombra debajo
+		for (int i = 0; i < 4; i++) {
+			if (shadowPos[i][0] >= 2 && shadowPos[i][0] < gridHeight &&
+					shadowPos[i][1] >= 0 && shadowPos[i][1] < gridWidth) {
+				if (grid[shadowPos[i][0]][shadowPos[i][1]] == 0) {
+					
+					// Quitarlo de la lista de cambiadas si existe
+					removeChangedTile(shadowPos[i][1], shadowPos[i][0]);
+					
+					// Dibujar la sombra
+					g.drawImage(getTileImage(8),
+							startX + tileWidth * shadowPos[i][1],
+							startY + tileHeight * (shadowPos[i][0] - 2),
+							tileWidth,
+							tileHeight,
+							null);
+					
+				}
+			}
+		}
+		
+		// Dibujar los tiles
 		if (firstPaint) {
 			
 			// Dibujar SOLO los tiles que han cambiado
@@ -504,25 +522,10 @@ public class TetrisGrid {
 			
 		}
 		
-		// Dibujar la sombra encima
+		// Añadir la sombra actual para la proxima vez que se llame esta funcion
 		for (int i = 0; i < 4; i++) {
-			if (shadowPos[i][0] >= 2 && shadowPos[i][0] < gridHeight &&
-					shadowPos[i][1] >= 0 && shadowPos[i][1] < gridWidth) {
-				if (grid[shadowPos[i][0]][shadowPos[i][1]] == 0) {
-					
-					// Cambiar el tile
-					addChangedTile(shadowPos[i][1], shadowPos[i][0]);
-					
-					// Dibujar la sombra
-					g.drawImage(getTileImage(8),
-							startX + tileWidth * shadowPos[i][1],
-							startY + tileHeight * (shadowPos[i][0] - 2),
-							tileWidth,
-							tileHeight,
-							null);
-					
-				}
-			}
+			// Cambiar el tile
+			addChangedTile(shadowPos[i][1], shadowPos[i][0]);
 		}
 		
 	}
@@ -538,9 +541,21 @@ public class TetrisGrid {
 	private void addChangedTile(int x, int y) {
 		if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
 			if (y < 2) { return; } // No dibujar tiles en las dos primeras filas porque no se ven
-			tilesChanged.add(new int[]{x, y}); 
+			if (!tilesChanged.contains(new int[]{x, y})) {
+				tilesChanged.add(new int[]{x, y}); 
+			}
 		} else {
 			System.out.println("Esto no deberia pasar (2). Posicion: " + x + "," + y); // dio error una vez 
+		}
+	}
+	
+	// Quita una tile de la lista de las que han cambiado si existe en la lista
+	private void removeChangedTile(int x, int y) {
+		for (int i = 0; i < tilesChanged.size(); i++) {
+			if (tilesChanged.get(i)[0] == x && tilesChanged.get(i)[1] == y) {
+				tilesChanged.remove(i);
+				break;
+			}
 		}
 	}
 	

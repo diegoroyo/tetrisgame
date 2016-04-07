@@ -83,7 +83,7 @@ public class StatsMenu implements Runnable {
 	// TODO: cambiar el nivel segun las lineas que lleva
 	public void addLines(int linesToAdd) {
 		lines += linesToAdd;
-		level = (int) Math.floor(lines / 10);
+		level = (int) Math.floor(lines / 10) + 1;
 		paintLvl(graphics);
 	}
 	
