@@ -8,6 +8,7 @@ public class TetrisGrid {
 	
 	// TODO: Hacer que cambie el nivel respecto a las lineas que lleva
 	// TODO: Mejorar el moveTetrimino y rotateTetrimino para cuando la pieza este chocandose contra la pared/suelo, a veces no deja moverlo
+
 	StatsMenu statsMenu;
 
 	public enum Direction {
