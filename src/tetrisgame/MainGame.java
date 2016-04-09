@@ -108,8 +108,6 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		else
 		{
 			tetrisGrid.applyForegroundGravity();
-			tetrisGrid.checkForFullRows();
-			tetrisGrid.applyBackgroundGravity();
 			tetrisGrid.updateShadowPosition();
 		}
 	}
@@ -156,12 +154,12 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 		
 		loopElapsedTimeMillis = (int) (new Date().getTime() - time) + (loopElapsedTimeMillis - LOOP_TIME);
 		if (PRINT_ELAPSED_TIME) {
-			System.out.println("Loop: " + (new Date().getTime() - time) + " ms");
+			System.out.println("Loop: " + (new Date().getTime() - time) + " ms / " + (loopElapsedTimeMillis - LOOP_TIME) + " ms");
 		} 
 		
 		time = new Date().getTime();
 		
-		return loopElapsedTimeMillis - LOOP_TIME;
+		return loopElapsedTimeMillis > LOOP_TIME ? loopElapsedTimeMillis - LOOP_TIME : 0;
 	}
 
 	@Override
