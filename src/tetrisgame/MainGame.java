@@ -64,7 +64,7 @@ public class MainGame extends Applet implements Runnable, KeyListener {
 			// archivos de statsmenu
 			imagesStatsMenu = new ArrayList<BufferedImage>();
 			
-			imagesStatsMenu.add(ImageIO.read(new File("data/menu_background2.png")));
+			imagesStatsMenu.add(ImageIO.read(new File("data/menu_background.png")));
 			imagesStatsMenu.add(ImageIO.read(new File("data/numbers.png")));
 			imagesStatsMenu.add(ImageIO.read(new File("data/numbers_background.png")));
 		} catch (IOException e) {
